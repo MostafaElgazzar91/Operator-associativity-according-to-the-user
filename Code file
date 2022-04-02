@@ -1,0 +1,241 @@
+#include<iostream>
+#include<string>
+#include <vector>
+using namespace std;
+
+// GLOBAL Declerations:
+char operators[10]; // Operators Array.
+char piority[5]; // Array for customized precedence.
+char precedence[] = { '/','*','^','+','-' }; // Array for default precedence.
+int numArr[10]; // Array of numbers.
+char z;
+int c;
+char zzz;
+int index;
+vector<int> ME;
+vector<char> MG;
+int  sum = 0;
+
+//To be public for all the code.
+void  looop();
+void relooop();
+
+// Function to get operations from the equation string.
+bool operat(char expression) {
+
+	char operators[5] = { '*','/','+','-','^' }; //Default operators.
+
+	for (int i = 0; i < 4; i++) //Move on string to take all operators
+	{
+		if (expression == operators[i]) {
+			return true;
+		}
+		else
+			return -1;
+	}
+}
+// Function to check numbers from string.  
+bool isNo(char exp) {
+
+	return exp >= '0' && exp <= '9';
+
+}
+// Remove spaces from input string.
+string trim(string exp) {
+
+	exp.erase(remove(exp.begin(), exp.end(), ' '), exp.end());
+	return exp;
+}
+//remove operator that has been excuted
+void eraseopp(int i) {
+	MG.erase(MG.begin() + (i));
+}
+// Check user choice L-R or R-L
+void RorL(char zzz) {
+	if (zzz == 'l')
+	{
+		cout << "You have choosen Left to Right: " << endl;
+		looop();
+	}
+	else
+	{
+		cout << "You have choosen Right to Left: " << endl;
+		relooop();
+	}
+}
+// Function to calculate
+void opera(char p, int i) { // 'p' for operation and 'i' for it's index.
+
+//Switch for all operations calculation cases  
+	switch (p) {
+
+	case '+':
+		sum = ME[i] + ME[i + 1];
+		ME[i] = sum; //value of addition
+		cout << ME[i] << " '+' operation is executed." << endl;
+		ME.erase(ME.begin() + (i + 1)); //Remove orignal number and replace it with executed number.
+		eraseopp(i); //function call to remove operator executed.
+		RorL(zzz); // function call to check the user choice L-R or R-L.
+		break;
+
+	case '-':
+		sum = ME[i] - ME[i + 1];
+		ME[i + 1] = sum;
+		ME[i] = sum; //value of difference.
+		cout << ME[i] << " '-' operation is executed." << endl;
+		ME.erase(ME.begin() + (i + 1));
+		eraseopp(i);
+		RorL(zzz);
+		break;
+
+	case '/':
+		sum = ME[i] / ME[i + 1];
+		ME[i + 1] = sum;
+		ME[i] = sum; //value of divide.
+		cout << ME[i] << " '/' operation is executed." << endl;
+		ME.erase(ME.begin() + (i + 1));
+		eraseopp(i);
+		RorL(zzz);
+		break;
+
+	case '*':
+		sum = ME[i] * ME[i + 1];
+		ME[i + 1] = sum;
+		ME[i] = sum; //value of multiplication.
+		cout << ME[i + 1] << " '/' operation is executed." << endl;
+		ME.erase(ME.begin() + (i + 1));
+		eraseopp(i);
+		RorL(zzz);
+		break;
+
+	case '^':
+		sum = pow(numArr[i], numArr[i + 1]);
+		ME[i + 1] = sum;
+		ME[i] = sum; //value of after power.
+		cout << ME[i + 1] << " '^' operation is executed." << endl;
+		ME.erase(ME.begin() + (i + 1));
+		eraseopp(i);
+		RorL(zzz);
+		break;
+	}
+	// i--;
+}
+// Ask user to use default precedence or to make customized one.
+void prec2ed() {
+	char x;
+	cout << "The default precedence is [ /, *, +, -, ^ ] .. Do you want to change it ? .." << endl;
+	cout << "Press y for YES .. Press n key for NO." << endl;
+	cin >> x;
+	if (x == 'y') {
+		for (int i = 0; i < 5; i++) {
+			char p;
+			cout << "YES, then please enter your customized priority:" << endl;
+			cout << "Please begin from the HIGHEST PRIORITY." << endl;
+			cin >> p;
+			piority[i] = p;
+		}
+	}
+	else {
+		for (int i = 0; i < 5; i++) {
+			cout << "Default Priority [ /, *, +, -, ^ ]" << endl;
+			piority[i] = precedence[i];
+		}
+	}
+}
+
+// L-R operations
+void looop() {
+	int i = 0;
+	for (; i < 5; i++) {
+		if (MG.empty()) { //stop condition
+			break;
+		}
+		else if (!MG.empty()) {
+			int i1 = 0;
+
+			for (int j = i1; j < c; j++) { // Set priority to the HIGHEST precedence.
+				if (piority[i] == MG[j]) {
+					index = j;
+					z = MG[j];
+					opera(z, index); // call function to calculate.
+				}
+			}
+		}
+
+	}
+}
+
+// R-L operations.
+void relooop() {
+
+	int i = 0;
+	for (; i < 5; i++) {
+		if (i == 6) {
+			break;
+		}
+		else
+		{
+			int i1 = c - 1; // number of operations in the equation.
+
+			for (int j = i1; j > -1; j--) { // reverse of operations vector.
+				if (piority[i] == MG[j]) {
+					index = j;
+					z = MG[j];
+					opera(z, index);
+				}
+			}
+		}
+
+	}
+}
+
+void main() {
+	int i = 0;
+	//int count = 0;
+	char operatorr;
+	string expression;
+	prec2ed(); // Call to enter precedence
+
+	cout << "Please enter your EQUATION: " << endl;
+	cin.ignore(); // to handle input again.
+	getline(cin, expression); // to get equation from user.
+	expression = trim(expression); // call trim function.
+
+	cout << "Do you want to use R-L OR L-R" << endl;
+	cout << "Enter 'r' for R-L or 'l' for L-R: " << endl;
+	cin >> zzz;
+
+	// Loop to read all the equation:
+	for (int j = 0; j < expression.length(); j++)
+	{
+		string number;
+
+		if (isNo(expression[j])) { // Call isNo functions to get numbers from the equation.
+			while (isNo(expression[j]))
+			{
+				number = expression[j];
+				c++; //numbers counter
+				j++; // conter to move on string
+			}
+			j--; // to back one index
+
+			numArr[j] = stoi(number); // Change numbers from STRING to INT.
+		}
+		else if (operat(expression[j])) { // Call operat function to get operations from the equation.
+
+			operatorr = expression[j];
+			//opcount++;
+			expression.erase(expression.begin() + j); // remove operator from string.
+			j--; // because we removed operator.
+			operators[i] = operatorr;
+			i++;
+		}
+	}
+	// Import arrays to vectors:
+	ME.assign(begin(numArr), end(numArr));
+	MG.assign(begin(operators), end(operators));
+
+	// To call RorL function for left or right assocavity.
+	RorL(zzz);
+	system("pause");
+}
